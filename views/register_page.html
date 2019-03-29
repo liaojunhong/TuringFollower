@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="public/css/style.css"/>
+    <script type="text/javascript" src="public/js/jquery.js"></script>
+</head>
+<body>
+<div class="register_page_box">
+    <input type="text" class="new_user_name">
+    <input type="password" class="new_user_password">
+</div>
+<button class="register_confirm">确认</button>
+<button class="register_reset">重置</button>
+<script type="text/javascript">
+    $(function () {
+        $('.register_confirm').click(function (e) {
+            var name = $('.new_user_name').val();
+            var password = $('.new_user_password').val();
+            if (name === '' || password === '') {
+                alert('名字和密码为必填~!');
+                return
+            }
+            $.post('/user_register', {name: name, psssword: password}, function (ret) {
+                if (ret.stat !== 0) {
+                    alert('fuck error');
+                } else {
+                    alert('注册成功');
+                    window.location.href = '/index'
+                }
+            })
+        })
+    })
+
+</script>
+</body>
+</html>

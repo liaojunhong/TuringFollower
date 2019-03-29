@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>系统登陆</title>
+    <link rel="stylesheet" type="text/css" href="public/css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="public/css/body.css"/>
+    <script type="text/javascript" src="public/js/jquery.js"></script>
+</head>
+<body>
+<div class="container">
+    <section id="content">
+        <form id="login_form" method="post">
+            <h1>系统登录
+            </h1>
+            <div>
+                <input type="text" placeholder="账号" minlength="3" maxlength="12" required="" name="name"/>
+            </div>
+            <div>
+                <input type="password" placeholder="密码" minlength="6" required="" name="password"/>
+            </div>
+            <div>
+                <input type="submit" value="登录" class="btn btn-primary" id="login_submit"/>
+                <input type="button" value="注册" class="btn btn-primary" id="login_register"/>
+                <a href="#">忘记密码?</a>
+            </div>
+        </form>
+    </section>
+</div>
+
+<br><br><br><br>
+<div style="text-align:center;">
+</div>
+</body>
+<script type="text/javascript">
+    $(function () {
+        $('#login_submit').click(function () {
+            var name = $('[name="name"]').val();
+            var password = $('[name="password"]').val();
+            $.ajax({
+                url: '/user_login',
+                type: 'post',
+                data: {name: name, password: password},
+                success: function (res) {
+                    if (res.stat === 0) {
+                        // window.location.href = '/index?Authorization=' + res.token
+                        $.ajax({
+                            url: "/index",
+                            type: "GET",//POST、PUT、DELETE
+                            beforeSend: function (xhr) {
+                                xhr.setRequestHeader("Authorization", res.token);//你要传的参数
+                            },
+                            success: function (data) {
+                            },
+                            error: function (xhr, textStatus, errorThrow) {
+                            }
+                        });
+                    } else {
+                        alert(res.msg)
+                    }
+                }
+            })
+        });
+        $('#login_register').click(function (e) {
+            window.location.href = '/register_page'
+        })
+    })
+</script>
+</html>
