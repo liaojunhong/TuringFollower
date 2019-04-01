@@ -12,9 +12,8 @@ const jwt = require('jsonwebtoken');
 mongoose.connect('mongodb://localhost/test');
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function () {
-    console.log('connectiong success')
-});
+db.once('open', () => console.log('connectiong success')
+);
 
 app.use(bodyParser.json());
 app.use(bodyParser.json({extended: false}));
@@ -39,7 +38,7 @@ app.use("*", function (req, res, next) {
     res.header("Access-Control-Allow-Headers", "content-type");
     res.header("Access-Control-Allow-Methods", "DELETE,PUT,POST,GET,OPTIONS");
     if (req.method.toLowerCase() == 'options')
-        res.send(200);  //让options尝试请求快速结束
+        res.send({stat: 0, msg: '请登录'});  //让options尝试请求快速结束
     else
         next();
 });
@@ -48,8 +47,6 @@ app.engine('html', require('express-art-template'));
 app.use('/public', express.static(path.join(__dirname, './public')));
 app.use(router);
 
-app.listen(3000, function () {
-    console.log('server is running 127.0.0.1:3000')
-});
+app.listen(3000, () => console.log('server is running 127.0.0.1:3000'));
 
 

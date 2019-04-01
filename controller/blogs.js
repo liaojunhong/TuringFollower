@@ -1,15 +1,18 @@
-const jwt = require('jsonwebtoken');
 const Blog = require('../model/blog');
-
+const formidable = require('formidable');
+const path = require('path');
+const fs = require('fs');
+const md5 = require('blueimp-md5');
 
 function createBlog(req, res) {
     const data = req.body;
     const blog = {
-        title: '测试博客2',
-        short_content: '短内容2',
-        content: '主要内容啊，发动机爱国范德萨干撒范德萨',
-        category_id: '5ca061921708b080ed975ccc',
-        user_id: '5ca060e474b04a1b3c501989'
+        title: data.title,
+        short_content: data.short_content,
+        content: data.content,
+        category_id: data.category_id,
+        user_id: data.user_id,
+        blog_image: data.blog_image
     };
     Blog.create(blog, function (err, data) {
         if (err) res.send({stat: 9999, msg: err});
@@ -21,7 +24,6 @@ function createBlog(req, res) {
 
 function getBlog(req, res) {
     var user_id = req.query.user_id;
-    console.log(user_id)
     Blog.find({user_id: user_id}, function (err, data) {
         if (err) res.send({stat: 9999, msg: err});
         else res.send({stat: 0, data: data})
@@ -37,7 +39,8 @@ function updateBlog(req, res) {
         short_content: data.short_content,
         content: data.content,
         blog_category: data.category_id,
-        user_id: data.user_id
+        user_id: data.user_id,
+        blog_image: data.blog_image
     };
     Blog.updateOne({_id: data.id}, {$set: new_data}, function (err, data) {
         if (err) res.send({stat: 9999, msg: err});
@@ -54,10 +57,28 @@ function deleteBlog(req, res) {
 
 }
 
+function uploadBlogImg(req, res) {
+    var form = new formidable.IncomingForm();
+    form.uploadDir = './public/images/';
+    form.parse(req, function (err, fields, files) {
+        //fields:{name:value}文本域；files：关于你所上传的这个文件的详细信息
+        if (err) return res.send({stat: 3000, msg: '解析失败!'});
+        console.log(fields);
+        console.log(files);
+        let oldpath = files.file.path;
+        let newpath = md5(oldpath) + path.parse(files.file.name).ext;
+        fs.rename(oldpath, newpath, function (err) {
+            if (err) res.send({stat: 1999, msg: '服务器错误!'});
+            else res.send({stat: 0, msg: 'ok!', image: newpath})
+        });
+    })
+}
+
 
 module.exports = {
     createBlog: createBlog,
     getBlog: getBlog,
     updateBlog: updateBlog,
-    deleteBlog: deleteBlog
+    deleteBlog: deleteBlog,
+    uploadBlogImg: uploadBlogImg
 };
