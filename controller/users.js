@@ -3,7 +3,6 @@ const md5 = require('blueimp-md5');
 const jwt = require('jsonwebtoken');
 
 
-
 function getAlluser(req, res) {
     User.find(function (err, data) {
         if (err) res.send({
@@ -17,13 +16,17 @@ function getAlluser(req, res) {
 function createUser(req, res) {
     temp_user = req.body;
     temp_user.password = md5(md5(temp_user.password));
-    User.create({
-        nick_name: temp_user.name,
-        password: temp_user.password,
-        user_permission: 0
-    }, function (err, data) {
-        if (err) res.send({stat: 9999, msg: err});
-        else res.send({stat: 0, msg: '注册成功!'})
+    User.findOne({nick_name: temp_user.name}, function (err, data) {
+        if(err) return res.send({stat:8888,msg:'服务器错误!~'});
+        if(data) return res.send({stat:1000,msg:'该用户名已经存在!'});
+        User.create({
+            nick_name: temp_user.name,
+            password: temp_user.password,
+            user_permission: 0
+        }, function (err, data) {
+            if (err) res.send({stat: 9999, msg: err});
+            else res.send({stat: 0, msg: '注册成功!'})
+        });
     });
 }
 
@@ -57,7 +60,7 @@ function loginIn(req, res) {
             var content = {name: data.nick_name};
             let secretOrPrivateKey = "test";         // 这是加密的key（密钥）
             let token = jwt.sign(content, secretOrPrivateKey, {
-                expiresIn: 60                        // 1分钟过期
+                expiresIn: 60 * 10                       // 1分钟过期
             });
             return res.send({token: token, stat: 0, msg: '登陆成功!'})
         }

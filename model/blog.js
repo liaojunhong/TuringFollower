@@ -4,11 +4,13 @@ const Schema = mongoose.Schema;
 const blogSchema = new Schema({
     user_id: {
         type: mongoose.Schema.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required: true
     },
     category_id: {
         type: mongoose.Schema.ObjectId,
-        ref:'BlogCategory'
+        ref: 'BlogCategory',
+        required: true
     },
     title: {
         type: String,

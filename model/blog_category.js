@@ -8,7 +8,8 @@ const blogCategorySchema = new Schema({
     },
     user_id: {
         type: mongoose.Schema.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required:true
     }
 });
 

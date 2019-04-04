@@ -17,6 +17,7 @@ router.get('/', function (req, res) {
 
 
 router.get('/get_blog', blog.getBlog)
+    .get('/get_blog_detail', blog.getBlogDetail)
     .post('/create_blog', blog.createBlog)
     .post('/update_blog', blog.updateBlog)
     .post('/delete_blog', blog.deleteBlog)
