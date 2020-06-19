@@ -1,4 +1,4 @@
-'use static';
+'use strict';
 
 const mongoose = require('mongoose');
 const express = require('express');
@@ -16,11 +16,11 @@ db.once('open', () => console.log('connectiong success')
 );
 
 app.use(bodyParser.json());
-app.use(bodyParser.json({extended: false}));
+app.use(bodyParser.json({ extended: false }));
 
 
 app.use(function (req, res, next) {   //处理_token检测中间件
-    console.log(req.url);
+    // console.log(req.url);
     next();
     // if (req.url.indexOf('/public') !== -1 || req.url === '/register_page' ||
     //     req.url === '/user_login'
@@ -29,18 +29,20 @@ app.use(function (req, res, next) {   //处理_token检测中间件
     //     var token = req.get("_token");
     //     var secretOrPrivateKey = 'test';
     //     jwt.verify(token, secretOrPrivateKey, (err, decode) => {
-    //         if (err) res.send({stat: 1000, msg: '请登录'});
+    //         if (err) res.send({ stat: 1000, msg: '请登录' });
     //         else next();
     //     })
     // }
 });
 
 app.use("*", function (req, res, next) {  //跨域处理
+    // next();
+    // res.writeHeader(200,{"Access-Control-Allow-Origin":'*'});
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "content-type");
     res.header("Access-Control-Allow-Methods", "DELETE,PUT,POST,GET,OPTIONS");
     if (req.method.toLowerCase() == 'options')
-        return res.send({stat: 0, msg: '请登录'});  //让options尝试请求快速结束
+        return res.send({ stat: 0, msg: '请登录' });  //让options尝试请求快速结束
     else
         next();
 });

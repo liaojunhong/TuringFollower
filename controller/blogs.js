@@ -22,13 +22,14 @@ function createBlog(req, res) {
 }
 
 function getBlog(req, res) {
-    var user_id = req.query.user_id;
-    var size = req.query.size || 10;
-    var page = req.query.page;
-    if (!page) return res.send({stat: 1000, msg: '请输入页码!'});
+    const user_id = req.query.user_id;
+    let size = req.query.size || 10;
+    if (!req.query.page) return res.send({stat: 1000, msg: '请输入页码!'});
+    let page = (req.query.page - 1) * size;
     Blog.count({user_id: user_id}, function (err, total) {
         if (err) return res.send({stat: 2100, msg: '服务器错误，错误信息:', err});
-        Blog.find({user_id: user_id}, '_id title category_id user_id blog_image blog_issuing_time').populate('category_id').limit(parseInt(size)).skip(parseInt(page) - 1).exec(function (err, data) {
+        Blog.find({user_id: user_id}, '_id title category_id user_id blog_image blog_issuing_time', {skip: page})
+            .populate('category_id').limit(parseInt(size)).exec(function (err, data) {
             if (err) res.send({stat: 9999, msg: err});
             else res.send({stat: 0, data: data, total: total})
         })
@@ -37,28 +38,26 @@ function getBlog(req, res) {
 
 function getBlogDetail(req, res) {
     var _id = req.query._id;
-    if(!_id) return res.send({stat:1000,msg:'请输入博客文章id!'});
-    Blog.findOne({_id:_id}, '_id title category_id short_content content user_id blog_image blog_issuing_time').populate('category_id').exec(function (err, data) {
-            if (err) return res.send({stat: 9999, msg: err});
-            if (data) return res.send({stat: 0, data: data});
-            else  res.send({stat: 2000, msg: '无此篇文章!'});
-        })
+    if (!_id) return res.send({stat: 1000, msg: '请输入博客文章id!'});
+    Blog.findOne({_id: _id}, '_id title category_id short_content content user_id blog_image blog_issuing_time').populate('category_id').exec(function (err, data) {
+        if (err) return res.send({stat: 9999, msg: err});
+        if (data) return res.send({stat: 0, data: data});
+        else res.send({stat: 2000, msg: '无此篇文章!'});
+    })
 }
 
 function updateBlog(req, res) {
-    const data = req.body;
-    const new_data = {
-        _id: data.id,
-        title: data.title,
-        short_content: data.short_content,
-        content: data.content,
-        blog_category: data.category_id,
-        user_id: data.user_id,
-        blog_image: data.blog_image
-    };
-    Blog.updateOne({_id: data.id}, {$set: new_data}, function (err, data) {
+    const data = req.body.data;
+    Blog.findOne({_id: data._id}, function (err, datas) {
         if (err) res.send({stat: 9999, msg: err});
-        else res.send({stat: 0, msg: '更新成功!'})
+        else {
+            delete data._id;
+            Object.assign(datas, data);
+            datas.save(function (err, ret) {
+                if (err) return res.send({stat: 9999, msg: err});
+                res.send({stat: 0, msg: '更新成功!'})
+            })
+        }
     })
 }
 

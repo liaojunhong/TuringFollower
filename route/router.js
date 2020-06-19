@@ -29,4 +29,14 @@ router.get('/get_blog_category', blog_category.getBlogCategory)
     .post('/update_blog_category', blog_category.updateBlogCategory)
     .post('/delete_blog_category', blog_category.deleteBlogCategory);
 
+router.post('/user/login_by_phone',function(req,res){
+    console.log(req)
+    // console.log(req.body);
+
+    return res.send({
+        stat:0,msg:'ok!'
+    })
+
+})    
+
 module.exports = router;
